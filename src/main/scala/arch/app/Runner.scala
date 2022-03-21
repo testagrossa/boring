@@ -29,8 +29,8 @@ object Runner {
       _ <- userRepo.set(user)
       u1 <- userRepo.get(user.id)
       u2 <- userRepo.get("Euge")
-      js1 = u1.map(jsonLibrary.jsonParser(User.userDecoder, User.userEncoder).from).map(jsonLibraryLive.prettyPrint)
-      js2 = u2.map(jsonLibrary.jsonParser(User.userDecoder, User.userEncoder).from).map(jsonLibraryLive.prettyPrint)
+      js1 = u1.map(jsonLibrary.jsonFromTo(User.userDecoder, User.userEncoder).from).map(jsonLibraryLive.prettyPrint)
+      js2 = u2.map(jsonLibrary.jsonFromTo(User.userDecoder, User.userEncoder).from).map(jsonLibraryLive.prettyPrint)
     } yield js1 -> js2
   }
 

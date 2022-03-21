@@ -17,13 +17,13 @@ class JsonLibraryF[F[_]: MError] extends JsonLibrary[F] {
   class From[A](implicit e: Encoder[A]) extends JsonFrom[A] {
     override def from(from: A): JsonType = e.apply(from)
   }
-  class JsonParserF[A](t: To[A], f: From[A]) extends JsonParser[A] {
+  class JsonFromToF[A](t: To[A], f: From[A]) extends JsonFromTo[A] {
     override def to(json: JsonType): F[A] = t.to(json)
     override def from(from: A): JsonType = f.from(from)
   }
   object PrettyPrinter extends JsonPrinter {
     override def prettyPrint(json: Json): String = Printer.spaces2.print(json)
   }
-  def jsonParser[A](implicit d: Decoder[A], e: Encoder[A]): JsonParser[A] = new JsonParserF[A](new To(), new From())
+  def jsonFromTo[A](implicit d: Decoder[A], e: Encoder[A]): JsonFromTo[A] = new JsonFromToF[A](new To(), new From())
   def prettyPrint(json: Json): String = PrettyPrinter.prettyPrint(json)
 }

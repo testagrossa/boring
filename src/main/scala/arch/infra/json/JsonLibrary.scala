@@ -12,5 +12,5 @@ trait JsonLibrary[F[_]] {
   trait JsonFrom[A] {
     def from(from: A): JsonType
   }
-  trait JsonParser[A] extends JsonTo[A] with JsonFrom[A]
+  trait JsonFromTo[A] extends JsonTo[A] with JsonFrom[A]
 }
