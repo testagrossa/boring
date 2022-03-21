@@ -2,19 +2,22 @@ package arch.app
 
 import arch.common.Program.MError
 import arch.common.ProgramLive
-import arch.infra.json.{JsonLibraryF, JsonLibraryLive}
+import arch.infra.json.{JsonLibraryF, JsonLibraryLive, JsonLibraryTest}
 import arch.model.UserModel.User
-import arch.model.{UserRepoF, UserRepoLive}
+import arch.model.{UserRepoF, UserRepoLive, UserRepoTest}
 
-import scala.concurrent.Await
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
 import cats.implicits._
 
 object Runner {
-  import ProgramLive.App
-  implicit val userRepoLive: UserRepoF[App] = UserRepoLive
-  implicit val jsonLibraryLive: JsonLibraryF[App] = JsonLibraryLive
+  // import ProgramLive.App
+  // import scala.concurrent.ExecutionContext.Implicits.global
+  // implicit val userRepoLive: UserRepoF[App] = UserRepoLive
+  // implicit val jsonLibraryLive: JsonLibraryF[App] = JsonLibraryLive
+
+  import ProgramLive.Test
+  implicit val userRepoLive: UserRepoF[Test] = UserRepoTest
+  implicit val jsonLibraryLive: JsonLibraryF[Test] = JsonLibraryTest
+
   type Args = JsonLibraryLive.JsonType
 
 
@@ -32,9 +35,14 @@ object Runner {
   }
 
   def main(args: Array[String]): Unit = {
+    import scala.concurrent.Await
+    import scala.concurrent.duration._
+
     val noArgs = null
-    val awaitable = run[App](noArgs)
-    val result = Await.result(awaitable.value, 1.second)
-    println(result)
+    // val awaitable = run[App](noArgs)
+    // val result = Await.result(awaitable.value, 1.second)
+    // println(result)
+    val awaitable = run[Test](noArgs)
+    println(awaitable)
   }
 }

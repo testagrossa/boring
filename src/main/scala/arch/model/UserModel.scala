@@ -3,6 +3,7 @@ package arch.model
 import io.circe._
 import io.circe.generic.semiauto._
 import arch.infra.json.JsonLibraryLive.{jsonParser, JsonParser}
+import arch.infra.json.JsonLibraryTest.{jsonParser, JsonParser}
 
 object UserModel extends Model {
   type Id = String
