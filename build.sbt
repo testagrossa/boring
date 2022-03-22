@@ -11,3 +11,5 @@ libraryDependencies ++= List(
 )
 
 libraryDependencies += "com.datastax.oss" % "java-driver-core" % "4.13.0"
+
+libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.11" % Runtime
