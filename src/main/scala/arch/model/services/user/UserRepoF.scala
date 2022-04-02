@@ -1,9 +1,11 @@
-package arch.model
+package arch.model.services.user
 
 import arch.common.Program
 import arch.common.Program.{Context, MError}
-import arch.model.UserModel.User
+import arch.model.Repo
+import arch.model.services.user.UserModel.User
 
+// IMPL class on top Map
 class UserRepoF[F[_]: MError] extends Repo[F] {
 
   type M = UserModel.type

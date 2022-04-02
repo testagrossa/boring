@@ -4,10 +4,9 @@ import arch.common.ProgramLive.{App, Test}
 import arch.infra.json.{JsonLibraryF, JsonLibraryLive, JsonLibraryTest}
 import arch.infra.router.RouterF
 import arch.infra.router.RouterLive.{RouterLive, RouterTest}
-import arch.model.services.RunAction.RunActionHandler
-import arch.model.services.RunServiceF.{RunServiceLive, RunServiceTest}
-import arch.model.services.{RunAction, RunServiceF}
-import arch.model.{UserRepoF, UserRepoLive, UserRepoTest}
+import arch.model.services.user.UserAction.UserActionHandler
+import arch.model.services.user.UserServiceF.{UserServiceLive$, UserServiceTest$}
+import arch.model.services.user._
 
 object ProgramBuilder {
   trait ProgramBuilder[F[_]] {
@@ -18,9 +17,9 @@ object ProgramBuilder {
     import ProgramLive.App
     implicit lazy val userRepoLive: UserRepoF[App] = UserRepoLive
     implicit lazy val jsonLibraryLive: JsonLibraryF[App] = JsonLibraryLive
-    implicit lazy val runService: RunServiceF[App] = RunServiceLive
+    implicit lazy val runService: UserServiceF[App] = UserServiceLive$
     implicit lazy val router: RouterF[App] = RouterLive
-    router.subscribe[RunAction](new RunActionHandler[App]())
+    router.subscribe[UserAction](new UserActionHandler[App]())
     router
   }
 
@@ -28,9 +27,9 @@ object ProgramBuilder {
     import ProgramLive.Test
     implicit lazy val userRepoLive: UserRepoF[Test] = UserRepoTest
     implicit lazy val jsonLibraryLive: JsonLibraryF[Test] = JsonLibraryTest
-    implicit lazy val runService: RunServiceF[Test] = RunServiceTest
+    implicit lazy val runService: UserServiceF[Test] = UserServiceTest$
     implicit lazy val router: RouterF[Test] = RouterTest
-    router.subscribe[RunAction](new RunActionHandler[Test]())
+    router.subscribe[UserAction](new UserActionHandler[Test]())
     router
   }
 }

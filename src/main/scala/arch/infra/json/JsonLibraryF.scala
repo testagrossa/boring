@@ -4,6 +4,7 @@ import arch.common.Program
 import arch.common.Program.{Context, MError}
 import io.circe.{Decoder, Encoder, Json, Printer, parser}
 
+// IMPL class on top of circe
 class JsonLibraryF[F[_]: MError] extends JsonLibrary[F] {
   type JsonType = Json
 

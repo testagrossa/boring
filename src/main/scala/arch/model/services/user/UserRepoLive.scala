@@ -1,4 +1,4 @@
-package arch.model
+package arch.model.services.user
 
 import arch.common.ProgramLive.{App, Test}
 
