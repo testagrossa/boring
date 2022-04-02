@@ -1,37 +1,33 @@
 package arch.app
 
 import arch.common.ProgramLive
-import arch.infra.json.{JsonLibraryF, JsonLibraryLive, JsonLibraryTest}
-import arch.infra.router.{ActionHandler, RouterF}
-import arch.infra.router.RouterF.RouterTest
-import arch.model.services.RunAction.RunActionHandler
-import arch.model.services.{RunAction, RunServiceF}
-import arch.model.services.RunServiceF.RunServiceTest
-import arch.model.{UserRepoF, UserRepoLive, UserRepoTest}
-// import cats.implicits._
+import arch.model.services.RunAction
 
 object Runner {
-  // import ProgramLive.App
-  // import scala.concurrent.ExecutionContext.Implicits.global
-  // implicit val userRepoLive: UserRepoF[App] = UserRepoLive
-  // implicit val jsonLibraryLive: JsonLibraryF[App] = JsonLibraryLive
-
-  import ProgramLive.Test
-  implicit val userRepoLive: UserRepoF[Test] = UserRepoTest
-  implicit val jsonLibraryLive: JsonLibraryF[Test] = JsonLibraryTest
-  implicit val runService: RunServiceF[Test] = RunServiceTest
-  implicit val router: RouterF[Test] = RouterTest
-
-  router.subscribe[RunAction](new RunActionHandler[Test]())
-
+  import arch.common.ProgramBuilder._
+  val prod = false
   def main(args: Array[String]): Unit = {
-    // import scala.concurrent.Await
-    // import scala.concurrent.duration._
+    val result = if(prod) {
+      // DEFINITIONS
+      import scala.concurrent.Await
+      import scala.concurrent.duration._
+      type Env[A] = ProgramLive.App[A]
+      // EXECUTION
+      val router = implicitly[ProgramBuilder[Env]].buildApp()
+      val actionResult = router.publish(RunAction(1))
+      // OUTPUT
+      val scheduler = monix.execution.Scheduler.Implicits.global
+      Await.result(actionResult.value.runToFuture(scheduler), 1.second)
+    } else {
+      // DEFINITIONS
+      type Env[A] = ProgramLive.Test[A]
+      // EXECUTION
+      val router = implicitly[ProgramBuilder[Env]].buildApp()
+      val actionResult = router.publish(RunAction(1))
+      // OUTPUT
+      actionResult
+    }
 
-    // val awaitable = router.publish(RunAction(1))
-    // val result = Await.result(awaitable.value, 1.second)
-    // println(result)
-    val awaitable = router.publish(RunAction(1))
-    println(awaitable)
+    println(result)
   }
 }

@@ -8,7 +8,6 @@ import arch.model.UserModel.User
 import arch.model.UserRepoF
 import cats.implicits._
 import io.circe.Json
-import org.slf4j.{Logger, LoggerFactory}
 
 trait RunService[F[_], A <: Action] {
   def run(args: A)(
@@ -55,7 +54,6 @@ class RunServiceF[F[_]: MError] extends RunService[F, RunAction] {
 }
 
 object RunServiceF {
-  import scala.concurrent.ExecutionContext.Implicits.global
   object RunServiceLive extends RunServiceF[App]
   object RunServiceTest extends RunServiceF[Test]
 }
