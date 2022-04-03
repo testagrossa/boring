@@ -1,4 +1,4 @@
-package arch.model.services.user
+package arch.domain.modules.user
 
 import arch.common.Program.MError
 import arch.common.ProgramLive.{App, Test}

@@ -1,15 +1,16 @@
 package arch.common
 
 import arch.common.ProgramLive.{App, Test}
+import arch.domain.modules.user.UserConfig.{UserConfigF, UserConfigLive, UserConfigTest}
+import arch.domain.modules.user.service.UserAction.UserActionHandler
+import arch.domain.modules.user.service.UserServiceF.{UserServiceLive, UserServiceTest}
+import arch.domain.modules.user.service.{UserAction, UserServiceF}
+import arch.domain.modules.user.{UserRepoF, UserRepoLive, UserRepoTest}
 import arch.infra.json.{JsonLibraryF, JsonLibraryLive, JsonLibraryTest}
 import arch.infra.monitoring.MonitoringLibrary
 import arch.infra.monitoring.MonitoringLive.{MonitoringLive, MonitoringTest}
 import arch.infra.router.RouterF
 import arch.infra.router.RouterLive.{RouterLive, RouterTest}
-import arch.model.services.user.UserAction.UserActionHandler
-import arch.model.services.user.UserConfig.{UserConfigF, UserConfigLive, UserConfigTest}
-import arch.model.services.user.UserServiceF.{UserServiceLive, UserServiceTest}
-import arch.model.services.user._
 import com.typesafe.config.Config
 
 object ProgramBuilder {

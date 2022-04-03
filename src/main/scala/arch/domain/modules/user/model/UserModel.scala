@@ -1,6 +1,6 @@
-package arch.model.services.user
+package arch.domain.modules.user.model
 
-import arch.model.Model
+import arch.domain.Model
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 import io.circe.{Decoder, Encoder}
 
@@ -15,4 +15,5 @@ object UserModel extends Model {
     implicit val userEncoder: Encoder[User] = deriveEncoder[User]
     implicit val identifier: Identifiable[User] = (user: User) => user.id
   }
+
 }

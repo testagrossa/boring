@@ -1,7 +1,7 @@
 package arch.app
 
 import arch.common.ProgramLive
-import arch.model.services.user.UserAction
+import arch.domain.modules.user.service.UserAction
 import com.typesafe.config.{Config, ConfigFactory}
 
 object Runner {

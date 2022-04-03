@@ -1,12 +1,13 @@
-package arch.model.services.user
+package arch.domain.modules.user.service
 
 import arch.common.Program.{Context, MError, ProgramError}
 import arch.common.ProgramLive.{App, Test}
+import arch.domain.modules.user.UserConfig.UserConfigF
+import arch.domain.modules.user.UserRepoF
+import arch.domain.modules.user.model.UserModel.User
 import arch.infra.json.{JsonLibraryF, JsonLibraryTest}
 import arch.infra.monitoring.MonitoringLibrary
 import arch.infra.router.{Action, ActionHandler}
-import arch.model.services.user.UserConfig.UserConfigF
-import arch.model.services.user.UserModel.User
 import cats.implicits._
 import com.typesafe.config.Config
 import io.circe.Json

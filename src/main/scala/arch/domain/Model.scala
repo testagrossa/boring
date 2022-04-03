@@ -1,4 +1,4 @@
-package arch.model
+package arch.domain
 
 trait Model {
   type Entity

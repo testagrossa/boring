@@ -1,4 +1,4 @@
-package arch.model
+package arch.domain
 
 trait Repo[F[_]] {
   type M <: Model
