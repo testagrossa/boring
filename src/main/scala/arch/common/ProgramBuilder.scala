@@ -32,7 +32,7 @@ object ProgramBuilder {
     implicit lazy val logger: LoggingLibrary[App] = LoggingApp
     implicit lazy val router: RouterF[App] = new RouterApp()
       .subscribe[UserAction](new UserActionHandler[App]())
-      .subscribe[UserAction](new UserActionHandler[App]())
+      .subscribe[UserAction](new UserActionHandler[App]()) // this is only added for debugging purposes
     router
   }
 
@@ -46,6 +46,7 @@ object ProgramBuilder {
     implicit lazy val logger: LoggingLibrary[Test] = LoggingTest
     implicit lazy val router: RouterF[Test] = new RouterTest()
       .subscribe[UserAction](new UserActionHandler[Test]())
+      .subscribe[UserAction](new UserActionHandler[Test]()) // this is only added for debugging purposes
     router
   }
 }
