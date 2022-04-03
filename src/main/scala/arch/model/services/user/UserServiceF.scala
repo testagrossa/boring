@@ -2,7 +2,7 @@ package arch.model.services.user
 
 import arch.common.Program.{Context, MError, ProgramError}
 import arch.common.ProgramLive.{App, Test}
-import arch.infra.json.{JsonLibraryF, JsonLibraryLive}
+import arch.infra.json.{JsonLibraryF, JsonLibraryTest}
 import arch.infra.router.{Action, ActionHandler}
 import arch.model.services.user.UserConfig.UserConfigF
 import arch.model.services.user.UserModel.User
@@ -17,7 +17,7 @@ trait UserService[F[_], A <: Action] {
 }
 
 case class UserAction(id: Int) extends Action {
-  type ReturnType = (Option[String], Option[JsonLibraryLive.JsonType], User)
+  type ReturnType = (Option[String], Option[JsonLibraryTest.JsonType], User)
 }
 
 object UserAction {
@@ -36,10 +36,10 @@ class UserServiceF[F[_]: MError](c: Config) extends UserService[F, UserAction] {
 
   def run(args: UserAction)(
     implicit userRepo: UserRepoF[F], jsonLibrary: JsonLibraryF[F], userConfig: UserConfigF[F]
-  ): F[(Option[String], Option[JsonLibraryLive.JsonType], User)] = {
+  ): F[(Option[String], Option[JsonLibraryTest.JsonType], User)] = {
     val ctx = Context("run")
     val user = User("Franco")
-    val userJsonFromTo = jsonLibrary.jsonFromTo(User.userDecoder, User.userEncoder)
+    val userJsonFromTo = jsonLibrary.jsonFromTo[User]
     for {
       config <- userConfig.fromConfig(c)
       _ = println(s"user config = $config")
