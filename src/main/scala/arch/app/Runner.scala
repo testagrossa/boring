@@ -8,7 +8,7 @@ object Runner {
   import arch.common.ProgramBuilder._
   import scala.jdk.CollectionConverters._
 
-  val prod = false
+  val prod = true
   val config: Config = ConfigFactory.parseMap(Map(
     "user.flag" -> true,
     "user.value" -> 1

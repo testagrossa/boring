@@ -37,18 +37,16 @@ class RouterF[F[_]: MError](
   private def handleAction[A <: Action](action: A, handler: A => F[Any]): F[A#ReturnType] = {
     val before = System.currentTimeMillis()
     val maybeResponse: F[A#ReturnType] = MError[F].map(handler(action))(_.asInstanceOf[A#ReturnType])
-    // @TODO not working in prod [note: it was working before when using Future instead of Task]
-    MError[F].map(maybeResponse) { result =>
-      onSuccess(action.getClass.getSimpleName)
-      recordLatencyInMillis(action.getClass.getSimpleName, before, System.currentTimeMillis())
-      result
-    }
-    MError[F].recoverWith(maybeResponse) {
+    val recoverable = MError[F].recoverWith(maybeResponse) {
       case error: ProgramError =>
         onFailure(error)
         recordLatencyInMillis(action.getClass.getSimpleName, before, System.currentTimeMillis())
         maybeResponse
     }
-    maybeResponse
+    MError[F].map(recoverable) { result =>
+      onSuccess(action.getClass.getSimpleName)
+      recordLatencyInMillis(action.getClass.getSimpleName, before, System.currentTimeMillis())
+      result
+    }
   }
 }

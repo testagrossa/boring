@@ -8,9 +8,10 @@ object Program {
 
   val unknownErrorCode = 0
 
-  case class Context(name: String, conf: Map[String, Any] = Map.empty)
-
+  type MError[F[_]] = MonadError[F, ProgramError]
+  case class Context(name: String, metadata: Map[String, Any] = Map.empty)
   case class ProgramError(error: Any, msg: String, ctx: Context, errorCode: Int = unknownErrorCode, stackTrace: Seq[String] = Seq.empty)
+
   object ProgramError {
     def fromThrowable(exception: Throwable): Context => Int => ProgramError = ctx => errorCode => {
       val stackTrace = Seq.empty // exception.getStackTrace.map(_.toString).take(10)
@@ -21,7 +22,6 @@ object Program {
     }
   }
 
-  type MError[F[_]] = MonadError[F, ProgramError]
   object MError {
     def apply[F[_]](implicit m: MError[F]): MError[F] = m
   }

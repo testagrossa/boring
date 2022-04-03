@@ -40,7 +40,6 @@ object UserAction {
 }
 
 class UserServiceF[F[_]: MError](c: Config) extends UserService[F, UserAction] {
-
   def run(args: UserAction)(
     implicit userRepo: UserRepoF[F],
     jsonLibrary: JsonLibraryF[F],
@@ -48,6 +47,7 @@ class UserServiceF[F[_]: MError](c: Config) extends UserService[F, UserAction] {
     monitoring: MonitoringLibrary[F]
   ): F[(Option[String], Option[JsonLibraryTest.JsonType], User)] = {
     val ctx = Context("run")
+
     val user = User("Franco")
     val userJsonFromTo = jsonLibrary.jsonFromTo[User]
     val counter = monitoring.counter("counter")
