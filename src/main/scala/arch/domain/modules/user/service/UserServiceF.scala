@@ -1,16 +1,14 @@
 package arch.domain.modules.user.service
 
 import arch.common.Program.{Context, MError, ProgramError}
-import arch.common.ProgramLive.{App, Test}
 import arch.domain.modules.user.UserConfig.UserConfigF
 import arch.domain.modules.user.UserRepoF
 import arch.domain.modules.user.model.UserModel.User
-import arch.infra.json.{JsonLibraryF, JsonLibraryTest}
+import arch.infra.json.JsonLibraryF
+import arch.infra.json.JsonLibraryLive.JsonLibraryTest
 import arch.infra.monitoring.MonitoringLibrary
-import arch.infra.router.{Action, ActionHandler}
 import cats.implicits._
 import com.typesafe.config.Config
-import io.circe.Json
 
 class UserServiceF[F[_]: MError](c: Config) extends UserService[F, UserAction] {
   def run(args: UserAction)(
@@ -41,9 +39,4 @@ class UserServiceF[F[_]: MError](c: Config) extends UserService[F, UserAction] {
       js2 = u2.map(userJsonFromTo.from)
     } yield (js1, js2, parsedJson)
   }
-}
-
-object UserServiceF {
-  class UserServiceLive(c: Config) extends UserServiceF[App](c)
-  class UserServiceTest(c: Config) extends UserServiceF[Test](c)
 }

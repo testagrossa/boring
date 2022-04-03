@@ -4,7 +4,8 @@ import arch.common.Program.MError
 import arch.domain.modules.user.UserConfig.UserConfigF
 import arch.domain.modules.user.UserRepoF
 import arch.domain.modules.user.model.UserModel.User
-import arch.infra.json.{JsonLibraryF, JsonLibraryTest}
+import arch.infra.json.JsonLibraryF
+import arch.infra.json.JsonLibraryLive.JsonLibraryTest
 import arch.infra.monitoring.MonitoringLibrary
 import arch.infra.router.{Action, ActionHandler}
 import io.circe.Json

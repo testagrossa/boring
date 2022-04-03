@@ -18,6 +18,6 @@ object UserConfig {
     }
   }
 
-  object UserConfigLive extends UserConfigF[App]
+  object UserConfigApp extends UserConfigF[App]
   object UserConfigTest extends UserConfigF[Test]
 }

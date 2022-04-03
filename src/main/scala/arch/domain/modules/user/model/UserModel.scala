@@ -15,5 +15,4 @@ object UserModel extends Model {
     implicit val userEncoder: Encoder[User] = deriveEncoder[User]
     implicit val identifier: Identifiable[User] = (user: User) => user.id
   }
-
 }

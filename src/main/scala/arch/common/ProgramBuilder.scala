@@ -1,16 +1,18 @@
 package arch.common
 
 import arch.common.ProgramLive.{App, Test}
-import arch.domain.modules.user.UserConfig.{UserConfigF, UserConfigLive, UserConfigTest}
+import arch.domain.modules.user.UserConfig.{UserConfigApp, UserConfigF, UserConfigTest}
+import arch.domain.modules.user.UserRepoF
+import arch.domain.modules.user.UserRepoLive.{UserRepoApp, UserRepoTest}
 import arch.domain.modules.user.service.UserAction.UserActionHandler
-import arch.domain.modules.user.service.UserServiceF.{UserServiceLive, UserServiceTest}
+import arch.domain.modules.user.service.UserServiceLive.{UserServiceApp, UserServiceTest}
 import arch.domain.modules.user.service.{UserAction, UserServiceF}
-import arch.domain.modules.user.{UserRepoF, UserRepoLive, UserRepoTest}
-import arch.infra.json.{JsonLibraryF, JsonLibraryLive, JsonLibraryTest}
+import arch.infra.json.JsonLibraryF
+import arch.infra.json.JsonLibraryLive.{JsonLibraryApp, JsonLibraryTest}
 import arch.infra.monitoring.MonitoringLibrary
-import arch.infra.monitoring.MonitoringLive.{MonitoringLive, MonitoringTest}
+import arch.infra.monitoring.MonitoringLive.{MonitoringApp, MonitoringTest}
 import arch.infra.router.RouterF
-import arch.infra.router.RouterLive.{RouterLive, RouterTest}
+import arch.infra.router.RouterLive.{RouterApp, RouterTest}
 import com.typesafe.config.Config
 
 object ProgramBuilder {
@@ -20,12 +22,12 @@ object ProgramBuilder {
 
   implicit lazy val production: ProgramBuilder[App] = (config: Config) => {
     import ProgramLive.App
-    implicit lazy val userRepoLive: UserRepoF[App] = UserRepoLive
-    implicit lazy val jsonLibraryLive: JsonLibraryF[App] = JsonLibraryLive
-    implicit lazy val monitoring: MonitoringLibrary[App] = MonitoringLive
-    implicit lazy val userConfigF: UserConfigF[App] = UserConfigLive
-    implicit lazy val runService: UserServiceF[App] = new UserServiceLive(config.getConfig("user"))
-    implicit lazy val router: RouterF[App] = RouterLive
+    implicit lazy val userRepoLive: UserRepoF[App] = UserRepoApp
+    implicit lazy val jsonLibraryLive: JsonLibraryF[App] = JsonLibraryApp
+    implicit lazy val monitoring: MonitoringLibrary[App] = MonitoringApp
+    implicit lazy val userConfigF: UserConfigF[App] = UserConfigApp
+    implicit lazy val runService: UserServiceF[App] = new UserServiceApp(config.getConfig("user"))
+    implicit lazy val router: RouterF[App] = RouterApp
     router.subscribe[UserAction](new UserActionHandler[App]())
     router
   }
