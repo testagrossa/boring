@@ -2,6 +2,8 @@ package arch.common
 
 import arch.common.ProgramLive.{App, Test}
 import arch.infra.json.{JsonLibraryF, JsonLibraryLive, JsonLibraryTest}
+import arch.infra.monitoring.MonitoringLibrary
+import arch.infra.monitoring.MonitoringLive.{MonitoringLive, MonitoringTest}
 import arch.infra.router.RouterF
 import arch.infra.router.RouterLive.{RouterLive, RouterTest}
 import arch.model.services.user.UserAction.UserActionHandler
@@ -19,6 +21,7 @@ object ProgramBuilder {
     import ProgramLive.App
     implicit lazy val userRepoLive: UserRepoF[App] = UserRepoLive
     implicit lazy val jsonLibraryLive: JsonLibraryF[App] = JsonLibraryLive
+    implicit lazy val monitoring: MonitoringLibrary[App] = MonitoringLive
     implicit lazy val userConfigF: UserConfigF[App] = UserConfigLive
     implicit lazy val runService: UserServiceF[App] = new UserServiceLive(config.getConfig("user"))
     implicit lazy val router: RouterF[App] = RouterLive
@@ -30,6 +33,7 @@ object ProgramBuilder {
     import ProgramLive.Test
     implicit lazy val userRepoLive: UserRepoF[Test] = UserRepoTest
     implicit lazy val jsonLibraryLive: JsonLibraryF[Test] = JsonLibraryTest
+    implicit lazy val monitoring: MonitoringLibrary[Test] = MonitoringTest
     implicit lazy val userConfigF: UserConfigF[Test] = UserConfigTest
     implicit lazy val runService: UserServiceF[Test] = new UserServiceTest(config.getConfig("user"))
     implicit lazy val router: RouterF[Test] = RouterTest

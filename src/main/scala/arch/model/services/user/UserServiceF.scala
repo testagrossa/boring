@@ -3,6 +3,7 @@ package arch.model.services.user
 import arch.common.Program.{Context, MError, ProgramError}
 import arch.common.ProgramLive.{App, Test}
 import arch.infra.json.{JsonLibraryF, JsonLibraryTest}
+import arch.infra.monitoring.MonitoringLibrary
 import arch.infra.router.{Action, ActionHandler}
 import arch.model.services.user.UserConfig.UserConfigF
 import arch.model.services.user.UserModel.User
@@ -12,7 +13,11 @@ import io.circe.Json
 
 trait UserService[F[_], A <: Action] {
   def run(args: A)(
-    implicit userRepo: UserRepoF[F], jsonLibrary: JsonLibraryF[F], userConfig: UserConfigF[F] // @TODO revisit if this should go into constructor
+    // @TODO revisit if this should go into constructor
+    implicit userRepo: UserRepoF[F],
+    jsonLibrary: JsonLibraryF[F],
+    userConfig: UserConfigF[F],
+    monitoring: MonitoringLibrary[F]
   ): F[A#ReturnType]
 }
 
@@ -26,7 +31,8 @@ object UserAction {
     service: UserServiceF[F],
     userRepo: UserRepoF[F],
     jsonLibrary: JsonLibraryF[F],
-    userConfig: UserConfigF[F]
+    userConfig: UserConfigF[F],
+    monitoring: MonitoringLibrary[F]
   ) extends ActionHandler[F, UserAction] {
     override def handle(a: UserAction): F[(Option[String], Option[Json], User)] = service.run(a)
   }
@@ -35,13 +41,18 @@ object UserAction {
 class UserServiceF[F[_]: MError](c: Config) extends UserService[F, UserAction] {
 
   def run(args: UserAction)(
-    implicit userRepo: UserRepoF[F], jsonLibrary: JsonLibraryF[F], userConfig: UserConfigF[F]
+    implicit userRepo: UserRepoF[F],
+    jsonLibrary: JsonLibraryF[F],
+    userConfig: UserConfigF[F],
+    monitoring: MonitoringLibrary[F]
   ): F[(Option[String], Option[JsonLibraryTest.JsonType], User)] = {
     val ctx = Context("run")
     val user = User("Franco")
     val userJsonFromTo = jsonLibrary.jsonFromTo[User]
+    val counter = monitoring.counter("counter")
     for {
       config <- userConfig.fromConfig(c)
+      _ <- counter.increment()
       _ = println(s"user config = $config")
       _ <- userRepo.set(user)
       u1 <- userRepo.get(user.id)

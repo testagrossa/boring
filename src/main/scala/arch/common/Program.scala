@@ -23,7 +23,7 @@ object Program {
 
   type MError[F[_]] = MonadError[F, ProgramError]
   object MError {
-    def apply[F[_]](implicit m: MonadError[F, ProgramError]): MonadError[F, ProgramError] = m
+    def apply[F[_]](implicit m: MError[F]): MError[F] = m
   }
 
   object App {
