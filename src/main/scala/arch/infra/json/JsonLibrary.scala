@@ -2,7 +2,6 @@ package arch.infra.json
 
 trait JsonLibrary[F[_]] {
   type JsonType
-
   trait JsonPrinter {
     def prettyPrint(json: JsonType): String
   }

@@ -5,11 +5,8 @@ import cats.implicits._
 
 trait MonitoringLibrary[F[_]] {
   import MonitoringLibrary._
-
   def counter(name: String, context: Map[String, String] = Map.empty): CounterF[F]
-
   def gauge(name: String): GaugeF[F]
-
   def histogram(name: String): HistogramF[F]
 }
 
