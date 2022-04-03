@@ -1,17 +1,16 @@
 package arch.infra.router
 
 import arch.common.Program.{Context, MError, ProgramError}
-import org.slf4j.Logger
+import arch.infra.logging.LoggingLibrary
 
 import scala.reflect.ClassTag
 
 class RouterF[F[_]: MError](
- logger: Logger,
  onSuccess: String => Unit = _ => { println("success") },
  onFailure: ProgramError => Unit = _ => { println("failure") },
- recordLatencyInMillis: (String, Long, Long) => Unit = (_, _, _) => { println("recording latency") }
-) extends Router[F] {
-  private var handlers: Map[Class[_], Action => F[Any]] = Map.empty
+ recordLatencyInMillis: (String, Long, Long) => Unit = (_, _, _) => { println("recording latency") },
+ handlers: Map[Class[_], Action => F[Any]] = Map.empty[Class[_], Action => F[Any]]
+)(implicit logger: LoggingLibrary[F]) extends Router[F] {
   private val context: Context = Context("router")
   private val actionNotFoundErrorCode = 1
 
@@ -24,13 +23,16 @@ class RouterF[F[_]: MError](
       )
     }
 
-  override def subscribe[A <: Action : ClassTag](handler: ActionHandler[F, A]): Unit = {
+  override def subscribe[A <: Action : ClassTag](handler: ActionHandler[F, A]): RouterF[F] = {
     val classTag = implicitly[ClassTag[A]]
     if (handlers.contains(classTag.runtimeClass)) {
-      logger.warn("handler already subscribed", "handler_name" -> handler.getClass.getSimpleName)
+      logger.logWarn("handler already subscribed")(context.copy(
+        metadata = context.metadata + ("handler_name" -> handler.getClass.getSimpleName)
+      ))
+      new RouterF(onSuccess, onFailure, recordLatencyInMillis, handlers)
     } else {
       val transformed: Action => F[Any] = (t: Action) => MError[F].map(handler.handle(t.asInstanceOf[A]))(_.asInstanceOf[Any])
-      handlers = handlers + (classTag.runtimeClass -> transformed)
+      new RouterF(onSuccess, onFailure, recordLatencyInMillis, handlers + (classTag.runtimeClass -> transformed))
     }
   }
 

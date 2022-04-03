@@ -1,10 +1,9 @@
 package arch.infra.router
 
 import arch.common.ProgramLive.{App, Test}
-import org.slf4j.{Logger, LoggerFactory}
+import arch.infra.logging.LoggingLibrary
 
 object RouterLive {
-  val logger: Logger = LoggerFactory.getLogger("RouterLogger")
-  object RouterApp extends RouterF[App](logger)
-  object RouterTest extends RouterF[Test](logger)
+  class RouterApp(implicit logger: LoggingLibrary[App]) extends RouterF[App]
+  class RouterTest(implicit logger: LoggingLibrary[Test]) extends RouterF[Test]
 }

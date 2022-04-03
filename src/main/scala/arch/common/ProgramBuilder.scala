@@ -9,6 +9,8 @@ import arch.domain.modules.user.service.UserServiceLive.{UserServiceApp, UserSer
 import arch.domain.modules.user.service.{UserAction, UserServiceF}
 import arch.infra.json.JsonLibraryF
 import arch.infra.json.JsonLibraryLive.{JsonLibraryApp, JsonLibraryTest}
+import arch.infra.logging.LoggingLibrary
+import arch.infra.logging.LoggingLive.{LoggingApp, LoggingTest}
 import arch.infra.monitoring.MonitoringLibrary
 import arch.infra.monitoring.MonitoringLive.{MonitoringApp, MonitoringTest}
 import arch.infra.router.RouterF
@@ -27,8 +29,10 @@ object ProgramBuilder {
     implicit lazy val monitoring: MonitoringLibrary[App] = MonitoringApp
     implicit lazy val userConfigF: UserConfigF[App] = UserConfigApp
     implicit lazy val runService: UserServiceF[App] = new UserServiceApp(config.getConfig("user"))
-    implicit lazy val router: RouterF[App] = RouterApp
-    router.subscribe[UserAction](new UserActionHandler[App]())
+    implicit lazy val logger: LoggingLibrary[App] = LoggingApp
+    implicit lazy val router: RouterF[App] = new RouterApp()
+      .subscribe[UserAction](new UserActionHandler[App]())
+      .subscribe[UserAction](new UserActionHandler[App]())
     router
   }
 
@@ -39,8 +43,9 @@ object ProgramBuilder {
     implicit lazy val monitoring: MonitoringLibrary[Test] = MonitoringTest
     implicit lazy val userConfigF: UserConfigF[Test] = UserConfigTest
     implicit lazy val runService: UserServiceF[Test] = new UserServiceTest(config.getConfig("user"))
-    implicit lazy val router: RouterF[Test] = RouterTest
-    router.subscribe[UserAction](new UserActionHandler[Test]())
+    implicit lazy val logger: LoggingLibrary[Test] = LoggingTest
+    implicit lazy val router: RouterF[Test] = new RouterTest()
+      .subscribe[UserAction](new UserActionHandler[Test]())
     router
   }
 }
