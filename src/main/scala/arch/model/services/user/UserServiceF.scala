@@ -4,13 +4,15 @@ import arch.common.Program.{Context, MError, ProgramError}
 import arch.common.ProgramLive.{App, Test}
 import arch.infra.json.{JsonLibraryF, JsonLibraryLive}
 import arch.infra.router.{Action, ActionHandler}
-import UserModel.User
+import arch.model.services.user.UserConfig.UserConfigF
+import arch.model.services.user.UserModel.User
 import cats.implicits._
+import com.typesafe.config.Config
 import io.circe.Json
 
 trait UserService[F[_], A <: Action] {
   def run(args: A)(
-    implicit userRepo: UserRepoF[F], jsonLibrary: JsonLibraryF[F] // @TODO revisit if this should go into constructor
+    implicit userRepo: UserRepoF[F], jsonLibrary: JsonLibraryF[F], userConfig: UserConfigF[F] // @TODO revisit if this should go into constructor
   ): F[A#ReturnType]
 }
 
@@ -23,21 +25,24 @@ object UserAction {
     implicit
     service: UserServiceF[F],
     userRepo: UserRepoF[F],
-    jsonLibrary: JsonLibraryF[F]
+    jsonLibrary: JsonLibraryF[F],
+    userConfig: UserConfigF[F]
   ) extends ActionHandler[F, UserAction] {
     override def handle(a: UserAction): F[(Option[String], Option[Json], User)] = service.run(a)
   }
 }
 
-class UserServiceF[F[_]: MError] extends UserService[F, UserAction] {
+class UserServiceF[F[_]: MError](c: Config) extends UserService[F, UserAction] {
 
   def run(args: UserAction)(
-    implicit userRepo: UserRepoF[F], jsonLibrary: JsonLibraryF[F]
+    implicit userRepo: UserRepoF[F], jsonLibrary: JsonLibraryF[F], userConfig: UserConfigF[F]
   ): F[(Option[String], Option[JsonLibraryLive.JsonType], User)] = {
     val ctx = Context("run")
     val user = User("Franco")
     val userJsonFromTo = jsonLibrary.jsonFromTo(User.userDecoder, User.userEncoder)
     for {
+      config <- userConfig.fromConfig(c)
+      _ = println(s"user config = $config")
       _ <- userRepo.set(user)
       u1 <- userRepo.get(user.id)
       u2 <- userRepo.get("Euge")
@@ -54,6 +59,6 @@ class UserServiceF[F[_]: MError] extends UserService[F, UserAction] {
 }
 
 object UserServiceF {
-  object UserServiceLive$ extends UserServiceF[App]
-  object UserServiceTest$ extends UserServiceF[Test]
+  class UserServiceLive(c: Config) extends UserServiceF[App](c)
+  class UserServiceTest(c: Config) extends UserServiceF[Test](c)
 }

@@ -1,7 +1,6 @@
 package arch.infra.router
 
 import arch.common.Program.{Context, MError, ProgramError}
-import cats.Monad
 import org.slf4j.Logger
 
 import scala.reflect.ClassTag
