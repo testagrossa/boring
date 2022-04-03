@@ -12,33 +12,6 @@ import cats.implicits._
 import com.typesafe.config.Config
 import io.circe.Json
 
-trait UserService[F[_], A <: Action] {
-  def run(args: A)(
-    // @TODO revisit if this should go into constructor
-    implicit userRepo: UserRepoF[F],
-    jsonLibrary: JsonLibraryF[F],
-    userConfig: UserConfigF[F],
-    monitoring: MonitoringLibrary[F]
-  ): F[A#ReturnType]
-}
-
-case class UserAction(id: Int) extends Action {
-  type ReturnType = (Option[String], Option[JsonLibraryTest.JsonType], User)
-}
-
-object UserAction {
-  class UserActionHandler[F[_]: MError](
-    implicit
-    service: UserServiceF[F],
-    userRepo: UserRepoF[F],
-    jsonLibrary: JsonLibraryF[F],
-    userConfig: UserConfigF[F],
-    monitoring: MonitoringLibrary[F]
-  ) extends ActionHandler[F, UserAction] {
-    override def handle(a: UserAction): F[(Option[String], Option[Json], User)] = service.run(a)
-  }
-}
-
 class UserServiceF[F[_]: MError](c: Config) extends UserService[F, UserAction] {
   def run(args: UserAction)(
     implicit userRepo: UserRepoF[F],
