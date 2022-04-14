@@ -1,13 +1,9 @@
-name: Publish
+name: release/patch
 
 on:
   push:
     branches:
-      - master
       - main
-      # for testing the GH Action without merging to main,
-      # in some cases
-      - test-publish-snapshots
     tags: ["*"]
 
 jobs:
@@ -25,10 +21,14 @@ jobs:
         with:
           java-version: adopt@1.11.0-9
       - name: Publish
+        if: github.event.pusher.name != 'GitHub Actions Bot'
         run: |-
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+          sbt "versionBump patch"
+          git add version.sbt
+          git commit -m "Bump version"
+          git push origin main
           sbt publish
         env:
-          PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
-          PGP_SECRET: ${{ secrets.PGP_SECRET }}
-          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          PUBLISH_TOKEN: ${{ secrets.PUBLISH_TOKEN }}

@@ -1,16 +1,23 @@
+import sbtghpackages.TokenSource.{Environment, GitConfig}
+
+import scala.language.postfixOps
+import scala.util.Try
+
 name := "boring"
 
 scalaVersion := "2.13.6"
 
 name := "boring"
 scalaVersion := "2.13.3"
-version := "0.0.1"
 organization := "Prom3th3us"
 
 // configs for sbt-github-packages plugin
 githubOwner := "Prom3th3us"
 githubRepository := "boring"
-githubTokenSource := TokenSource.GitConfig("github.token")
+githubTokenSource := TokenSource.Or(
+  GitConfig("github.token"),
+  Environment("PUBLISH_TOKEN")
+)
 
 libraryDependencies ++= List(
   "com.softwaremill.sttp.client3" %% "async-http-client-backend-monix" % "3.3.15",
@@ -21,6 +28,3 @@ libraryDependencies ++= List(
 libraryDependencies += "com.typesafe" % "config" % "1.4.2"
 
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.11" % Runtime
-
-enablePlugins(SemVerPlugin)
-gitVersioningSnapshotLowerBound in ThisBuild := "0.0.1"
