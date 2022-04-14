@@ -1,6 +1,6 @@
 package arch.infra.logging
 
-import arch.common.Program.Context
+import arch.common.Context
 
 trait LoggingLibrary[F[_]] {
   def logDebug(msg: String): Context => F[Unit]

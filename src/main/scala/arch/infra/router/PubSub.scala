@@ -1,4 +1,4 @@
-package arch.infra.router.simple
+package arch.infra.router
 
 import scala.collection.mutable
 

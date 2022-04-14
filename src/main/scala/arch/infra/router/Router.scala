@@ -1,8 +1,24 @@
 package arch.infra.router
 
-import scala.reflect.ClassTag
+trait Router[In, Out] {
+  def route: In => Out
+}
 
-trait Router[F[_]] {
-  def subscribe[A <: Action: ClassTag](handler: ActionHandler[F, A]): RouterF[F]
-  def publish[A <: Action](action: A): F[A#ReturnType]
+object Router {
+  class RouterMock[In, Out](handler: In => Out) extends Router[In, Out] {
+    override def route = { in =>
+      handler(in)
+    }
+  }
+
+  object Example {
+    case class RequestJson(name: String)
+    case class ResponseJson(hello: String)
+
+    val example = new RouterMock[RequestJson, ResponseJson](handler = { in =>
+      ResponseJson(s"hello, ${in.name}")
+    })
+
+    example.route(RequestJson("name"))
+  }
 }
