@@ -17,10 +17,10 @@ class RouterF[F[_]: MError](
   private val context: Context = Context("router")
   private val actionNotFoundErrorCode = 1
 
-  private val handlers: mutable.HashMap[Class[_], Action => F[Any]] =
+  private val handlers: mutable.HashMap[Class[_], Action[_] => F[Any]] =
     mutable.HashMap.empty
 
-  override def publish[A <: Action](action: A): F[A#ReturnType] =
+  override def publish[O, A <: Action[O]](action: A): F[A#ReturnType] =
     handlers
       .get(action.getClass) match {
       case Some(handler) => handleAction(action, handler)
@@ -35,8 +35,8 @@ class RouterF[F[_]: MError](
         )
     }
 
-  override def subscribe[A <: Action: ClassTag](
-      handler: ActionHandler[F, A]
+  override def subscribe[O, A <: Action[O]: ClassTag](
+      handler: ActionHandler[F, O, A]
   ): Unit = {
     val classTag = implicitly[ClassTag[A]]
     if (handlers.contains(classTag.runtimeClass)) {
@@ -48,13 +48,13 @@ class RouterF[F[_]: MError](
       )
       ()
     } else {
-      val transformed: Action => F[Any] = (t: Action) =>
+      val transformed: Action[_] => F[Any] = (t: Action[_]) =>
         MError[F].map(handler.handle(t.asInstanceOf[A]))(_.asInstanceOf[Any])
       handlers.addOne((classTag.runtimeClass -> transformed))
     }
   }
 
-  private def handleAction[A <: Action](
+  private def handleAction[O, A <: Action[O]](
       action: A,
       handler: A => F[Any]
   ): F[A#ReturnType] = {

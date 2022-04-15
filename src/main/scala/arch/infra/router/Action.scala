@@ -1,5 +1,5 @@
 package arch.infra.router
 
-trait Action {
-  type ReturnType
+trait Action[R] {
+  type ReturnType = R
 }
