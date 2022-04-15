@@ -17,8 +17,8 @@ class RouterF[F[_]: MError](
   private val context: Context = Context("router")
   private val actionNotFoundErrorCode = 1
 
-  val handlers: mutable.HashMap[Class[_], Action => F[Any]] =
-    mutable.HashMap.empty[Class[_], Action => F[Any]]
+  private val handlers: mutable.HashMap[Class[_], Action => F[Any]] =
+    mutable.HashMap.empty
 
   override def publish[A <: Action](action: A): F[A#ReturnType] =
     handlers
@@ -80,4 +80,8 @@ class RouterF[F[_]: MError](
       result
     }
   }
+}
+
+object RouterF {
+  def apply[F[_]](implicit router: RouterF[F]): RouterF[F] = router
 }
