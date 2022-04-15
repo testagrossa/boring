@@ -20,7 +20,7 @@ class RouterF[F[_]: MError](
   private val handlers: mutable.HashMap[Class[_], Action[_] => F[Any]] =
     mutable.HashMap.empty
 
-  override def publish[O, A <: Action[O]](action: A): F[A#ReturnType] =
+  override def publish[O, A <: Action[O]](action: A): F[O] =
     handlers
       .get(action.getClass) match {
       case Some(handler) => handleAction(action, handler)
@@ -57,10 +57,10 @@ class RouterF[F[_]: MError](
   private def handleAction[O, A <: Action[O]](
       action: A,
       handler: A => F[Any]
-  ): F[A#ReturnType] = {
+  ): F[O] = {
     val before = System.currentTimeMillis()
-    val maybeResponse: F[A#ReturnType] =
-      MError[F].map(handler(action))(_.asInstanceOf[A#ReturnType])
+    val maybeResponse: F[O] =
+      MError[F].map(handler(action))(_.asInstanceOf[O])
     val recoverable = MError[F].recoverWith(maybeResponse) {
       case error: ProgramError =>
         onFailure(error)
