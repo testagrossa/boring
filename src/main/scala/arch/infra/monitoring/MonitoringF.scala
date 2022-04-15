@@ -2,11 +2,13 @@ package arch.infra.monitoring
 
 import arch.common.Program.MError
 import arch.infra.monitoring.MonitoringLibrary.{CounterF, GaugeF, HistogramF}
-import cats.implicits._
 
 // @TODO implement on top of some dependency (ie: grafana, kamon)
 class MonitoringF[F[_]: MError] extends MonitoringLibrary[F] {
-  override def counter(name: String, context: Map[String, String]): CounterF[F] = new CounterF[F] {
+  override def counter(
+      name: String,
+      context: Map[String, String]
+  ): CounterF[F] = new CounterF[F] {
     override def increment(): F[Unit] =
       MError[F].pure(println(s"counter increment"))
 

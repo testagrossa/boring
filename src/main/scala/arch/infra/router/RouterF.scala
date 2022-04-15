@@ -46,6 +46,7 @@ class RouterF[F[_]: MError](
             context.metadata + ("handler_name" -> handler.getClass.getSimpleName)
         )
       )
+      ()
     } else {
       val transformed: Action => F[Any] = (t: Action) =>
         MError[F].map(handler.handle(t.asInstanceOf[A]))(_.asInstanceOf[Any])
