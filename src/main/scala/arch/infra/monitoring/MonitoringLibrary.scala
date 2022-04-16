@@ -5,7 +5,10 @@ import cats.implicits._
 
 trait MonitoringLibrary[F[_]] {
   import MonitoringLibrary._
-  def counter(name: String, context: Map[String, String] = Map.empty): CounterF[F]
+  def counter(
+      name: String,
+      context: Map[String, String] = Map.empty
+  ): CounterF[F]
   def gauge(name: String): GaugeF[F]
   def histogram(name: String): HistogramF[F]
 }
@@ -42,7 +45,7 @@ object MonitoringLibrary {
       for {
         result <- codeToBenchmark
         _ = record(System.currentTimeMillis() - before)
-      } yield  result
+      } yield result
     }
   }
 }

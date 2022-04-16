@@ -14,7 +14,8 @@ object ConfigF {
 
   def parse[A, F[_]: MError](cfg: Config)(fn: Config => A): F[A] = {
     val either = Try(fn(cfg)) match {
-      case Failure(exception) => Left(ProgramError(exception, exception.getMessage, ctx))
+      case Failure(exception) =>
+        Left(ProgramError(exception, exception.getMessage, ctx))
       case Success(value) => Right(value)
     }
     MError[F].fromEither(either)

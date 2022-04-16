@@ -3,8 +3,8 @@ package arch.infra.router
 import scala.reflect.ClassTag
 
 trait Router[F[_]] {
-  def subscribe[O, A <: Action[O]: ClassTag](
-      handler: ActionHandler[F, O, A]
+  def subscribe[A <: Action[Any]: ClassTag](
+      handler: A => F[A#ReturnType]
   ): Unit
-  def publish[O, A <: Action[O]](action: A): F[O]
+  def publish[A <: Action[Any]](action: A): F[A#ReturnType]
 }

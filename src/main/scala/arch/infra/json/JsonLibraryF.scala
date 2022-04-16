@@ -14,7 +14,9 @@ class JsonLibraryF[F[_]: MError] extends JsonLibrary[F] {
 
   class To[A](implicit d: Decoder[A]) extends JsonTo[A] {
     override def to(json: JsonType): F[A] =
-      Program.App.fromEither[F, Throwable, A](ctx)(jsonDecodeErrorCode)(d.decodeJson(json))
+      Program.App.fromEither[F, Throwable, A](ctx)(jsonDecodeErrorCode)(
+        d.decodeJson(json)
+      )
   }
   class From[A](implicit e: Encoder[A]) extends JsonFrom[A] {
     override def from(from: A): JsonType = e.apply(from)
@@ -28,10 +30,13 @@ class JsonLibraryF[F[_]: MError] extends JsonLibrary[F] {
   }
   object JsonParserF extends JsonParser {
     override def parse(str: String): F[Json] =
-      Program.App.fromEither[F, Throwable, Json](ctx)(jsonParseErrorCode)(parser.parse(str))
+      Program.App.fromEither[F, Throwable, Json](ctx)(jsonParseErrorCode)(
+        parser.parse(str)
+      )
   }
 
-  def jsonFromTo[A](implicit d: Decoder[A], e: Encoder[A]): JsonFromTo[A] = new JsonFromToF[A](new To(), new From())
+  def jsonFromTo[A](implicit d: Decoder[A], e: Encoder[A]): JsonFromTo[A] =
+    new JsonFromToF[A](new To(), new From())
   def prettyPrint(json: Json): String = PrettyPrinter.prettyPrint(json)
   def parse(json: String): F[Json] = JsonParserF.parse(json)
 }

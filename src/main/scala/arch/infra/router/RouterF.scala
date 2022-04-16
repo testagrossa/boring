@@ -17,10 +17,10 @@ class RouterF[F[_]: MError](
   private val context: Context = Context("router")
   private val actionNotFoundErrorCode = 1
 
-  private val handlers: mutable.HashMap[Class[_], Action[_] => F[Any]] =
+  private val handlers: mutable.HashMap[Class[_], Action[Any] => F[Any]] =
     mutable.HashMap.empty
 
-  override def publish[O, A <: Action[O]](action: A): F[O] =
+  override def publish[A <: Action[Any]](action: A): F[A#ReturnType] =
     handlers
       .get(action.getClass) match {
       case Some(handler) => handleAction(action, handler)
@@ -35,32 +35,32 @@ class RouterF[F[_]: MError](
         )
     }
 
-  override def subscribe[O, A <: Action[O]: ClassTag](
-      handler: ActionHandler[F, O, A]
+  override def subscribe[A <: Action[Any]: ClassTag](
+      handler: A => F[A#ReturnType]
   ): Unit = {
     val classTag = implicitly[ClassTag[A]]
     if (handlers.contains(classTag.runtimeClass)) {
       logger.logWarn("handler already subscribed")(
         context.copy(
           metadata =
-            context.metadata + ("handler_name" -> handler.getClass.getSimpleName)
+            context.metadata + ("handler_name" -> classTag.runtimeClass.getClass.getSimpleName)
         )
       )
       ()
     } else {
       val transformed: Action[_] => F[Any] = (t: Action[_]) =>
-        MError[F].map(handler.handle(t.asInstanceOf[A]))(_.asInstanceOf[Any])
+        MError[F].map(handler(t.asInstanceOf[A]))(_.asInstanceOf[Any])
       handlers.addOne((classTag.runtimeClass -> transformed))
     }
   }
 
-  private def handleAction[O, A <: Action[O]](
+  private def handleAction[A <: Action[Any]](
       action: A,
       handler: A => F[Any]
-  ): F[O] = {
+  ): F[A#ReturnType] = {
     val before = System.currentTimeMillis()
-    val maybeResponse: F[O] =
-      MError[F].map(handler(action))(_.asInstanceOf[O])
+    val maybeResponse: F[A#ReturnType] =
+      MError[F].map(handler(action))(_.asInstanceOf[A#ReturnType])
     val recoverable = MError[F].recoverWith(maybeResponse) {
       case error: ProgramError =>
         onFailure(error)
